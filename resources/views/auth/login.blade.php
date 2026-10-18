@@ -1,47 +1,27 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+@extends('layouts.app')
+@section('title', 'Acceso al Sistema')
 
-    <form method="POST" action="{{ route('login') }}">
+@section('content')
+<div class="max-w-md mx-auto bg-white p-8 rounded shadow-lg border-t-8 border-blue-900 mt-20 relative overflow-hidden">
+    <div class="absolute -top-12 -left-12 w-32 h-32 cnfd-cyan cnfd-rounded"></div>
+    
+    <h2 class="text-3xl font-bold mb-6 text-center text-gray-800 relative z-10">Administración</h2>
+    
+    <form method="POST" action="{{ route('login') }}" class="relative z-10">
         @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2">Correo Electrónico</label>
+            <input type="email" name="email" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500" required autofocus>
+            @error('email') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="mb-6">
+            <label class="block text-gray-700 font-bold mb-2">Contraseña</label>
+            <input type="password" name="password" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500" required>
+            @error('password') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+        <button type="submit" class="w-full cnfd-bg text-white px-6 py-3 rounded-full font-bold shadow hover:bg-blue-800 transition">Ingresar</button>
     </form>
-</x-guest-layout>
+</div>
+@endsection

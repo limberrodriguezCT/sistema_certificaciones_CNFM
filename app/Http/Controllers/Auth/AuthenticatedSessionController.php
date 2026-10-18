@@ -28,7 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirección corregida hacia el panel de eventos del CNFD
+        return redirect()->intended(route('events.index', absolute: false));
     }
 
     /**
