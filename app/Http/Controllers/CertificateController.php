@@ -13,30 +13,28 @@ class CertificateController extends Controller
     private function generatePDF($event, $participants)
     {
         $pdf = new Fpdi('L', 'mm', 'A4');
-        $pdf->SetAutoPageBreak(false);
+        
+        // Configuraciones estrictas para eliminar los márgenes por defecto
+        $pdf->SetMargins(0, 0, 0, true);
+        $pdf->SetAutoPageBreak(false, 0);
         $pdf->SetPrintHeader(false);
         $pdf->SetPrintFooter(false);
 
         $templatePath = storage_path('app/public/' . $event->template_path);
-        $ext = strtolower(pathinfo($templatePath, PATHINFO_EXTENSION));
+        list($r, $g, $b) = sscanf($event->text_color, "#%02x%02x%02x");
 
         foreach ($participants as $participant) {
             $pdf->AddPage('L', 'A4');
             
-            if ($ext === 'pdf') {
-                $pdf->setSourceFile($templatePath);
-                $tplIdx = $pdf->importPage(1);
-                $pdf->useTemplate($tplIdx, 0, 0, 297, 210);
-            } else {
-                $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
-            }
+            // La imagen llena estrictamente los 297x210 mm
+            $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
 
-            $pdf->SetFont('helvetica', 'B', 24);
-            $pdf->SetTextColor(13, 71, 161); // Azul oscuro CNFD
+            $pdf->SetFont($event->font_family, 'B', $event->font_size);
+            $pdf->SetTextColor($r, $g, $b);
             
-            // Si quieres que el texto esté centrado, la coordenada X debería ser 0 y le damos el ancho total
             $pdf->SetXY(0, $event->y_coord);
-            $pdf->Cell(297, 10, mb_strtoupper($participant->full_name, 'UTF-8'), 0, 1, 'C');
+            // Alineación de celda configurada en 'T' para que calce exactamente desde el borde superior
+            $pdf->Cell(297, 0, mb_strtoupper($participant->full_name, 'UTF-8'), 0, 1, 'C', 0, '', 0, false, 'T', 'T');
         }
 
         return $pdf;
@@ -44,15 +42,19 @@ class CertificateController extends Controller
 
     public function preview(Event $event)
     {
-        $dummyParticipant = new Participant(['full_name' => 'NOMBRE DEL PROTAGONISTA DE PRUEBA']);
+        $dummyParticipant = new Participant(['full_name' => 'NOMBRE DEL PROTAGONISTA']);
         $pdf = $this->generatePDF($event, [$dummyParticipant]);
-        return response($pdf->Output('preview.pdf', 'I'))->header('Content-Type', 'application/pdf');
+        
+        if (ob_get_length()) ob_end_clean();
+        return response($pdf->Output('vista_previa_' . $event->title . '.pdf', 'D'))->header('Content-Type', 'application/pdf');
     }
 
     public function downloadIndividual(Participant $participant)
     {
         $event = $participant->event;
         $pdf = $this->generatePDF($event, [$participant]);
+        
+        if (ob_get_length()) ob_end_clean();
         return response($pdf->Output($participant->full_name . '.pdf', 'D'))->header('Content-Type', 'application/pdf');
     }
 
@@ -60,9 +62,11 @@ class CertificateController extends Controller
     {
         $participants = $event->participants;
         if($participants->isEmpty()){
-            return back()->with('error', 'No hay participantes registrados todavía.');
+            return back()->with('error', 'No existen participantes registrados en este evento.');
         }
         $pdf = $this->generatePDF($event, $participants);
+        
+        if (ob_get_length()) ob_end_clean();
         return response($pdf->Output('Consolidado_'.$event->title.'.pdf', 'D'))->header('Content-Type', 'application/pdf');
     }
 
@@ -70,13 +74,13 @@ class CertificateController extends Controller
     {
         $participants = $event->participants;
         if($participants->isEmpty()){
-            return back()->with('error', 'Ideay, no hay a quién enviarle correos.');
+            return back()->with('error', 'No existen participantes para enviar correos.');
         }
 
         foreach ($participants as $participant) {
             SendCertificateJob::dispatch($participant, $event);
         }
 
-        return back()->with('success', 'Los certificados se están enviando en segundo plano. Podés seguir usando el sistema.');
+        return back()->with('success', 'La emisión de certificados se está procesando en segundo plano.');
     }
 }

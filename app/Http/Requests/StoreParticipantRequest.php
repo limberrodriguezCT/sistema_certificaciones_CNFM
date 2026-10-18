@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreParticipantRequest extends FormRequest
 {
@@ -13,9 +14,26 @@ class StoreParticipantRequest extends FormRequest
 
     public function rules(): array
     {
+        $eventId = $this->route('event') ? $this->route('event')->id : $this->route('uuid');
+
         return [
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'cedula' => [
+                'required',
+                'string',
+                'regex:/^[0-9]{3}-[0-9]{6}-[0-9]{4}[A-Z]$/i',
+                Rule::unique('participants')->where(function ($query) use ($eventId) {
+                    return $query->where('event_id', $eventId);
+                })
+            ],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('participants')->where(function ($query) use ($eventId) {
+                    return $query->where('event_id', $eventId);
+                })
+            ],
             'phone' => 'required|string|max:20',
             'location' => 'required|string|max:255',
         ];
@@ -24,11 +42,15 @@ class StoreParticipantRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'full_name.required' => 'Por favor, ingresá tu nombre completo tal como querés que salga en el certificado.',
-            'email.required' => 'El correo electrónico es obligatorio para poder enviarte la información.',
-            'email.email' => 'Revisá bien tu correo, parece que el formato no es el correcto.',
-            'phone.required' => 'Dejanos un número de teléfono para cualquier contacto.',
-            'location.required' => 'No olvidés indicarnos tu lugar de procedencia.'
+            'full_name.required' => 'El nombre completo es obligatorio.',
+            'cedula.required' => 'El número de cédula es obligatorio.',
+            'cedula.regex' => 'La cédula debe tener el formato válido (Ej. 000-000000-0000A).',
+            'cedula.unique' => 'Este número de cédula ya se encuentra registrado en el evento actual.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Debe ingresar un formato de correo electrónico válido.',
+            'email.unique' => 'Este correo electrónico ya se encuentra registrado en el evento actual.',
+            'phone.required' => 'El número de teléfono es obligatorio.',
+            'location.required' => 'El lugar de procedencia es obligatorio.'
         ];
     }
 }

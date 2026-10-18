@@ -7,18 +7,17 @@
     
     <h2 class="text-3xl font-bold mb-6 text-center text-gray-800 relative z-10">Administración</h2>
     
-    <form method="POST" action="{{ route('login') }}" class="relative z-10">
+    <!-- Se agrega novalidate para evitar validación de HTML5 en inglés -->
+    <form method="POST" action="{{ route('login') }}" class="relative z-10" novalidate>
         @csrf
         <div class="mb-4">
             <label class="block text-gray-700 font-bold mb-2">Correo Electrónico</label>
-            <input type="email" name="email" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500" required autofocus>
-            @error('email') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
+            <input type="email" name="email" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500" autofocus>
         </div>
 
         <div class="mb-6">
             <label class="block text-gray-700 font-bold mb-2">Contraseña</label>
-            <input type="password" name="password" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500" required>
-            @error('password') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
+            <input type="password" name="password" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500">
         </div>
 
         <button type="submit" class="w-full cnfd-bg text-white px-6 py-3 rounded-full font-bold shadow hover:bg-blue-800 transition">Ingresar</button>

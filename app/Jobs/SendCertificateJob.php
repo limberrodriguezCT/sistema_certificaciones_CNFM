@@ -30,26 +30,22 @@ class SendCertificateJob implements ShouldQueue
     public function handle(): void
     {
         $pdf = new Fpdi('L', 'mm', 'A4');
-        $pdf->SetAutoPageBreak(false);
+        $pdf->SetMargins(0, 0, 0, true);
+        $pdf->SetAutoPageBreak(false, 0);
         $pdf->SetPrintHeader(false);
         $pdf->SetPrintFooter(false);
 
         $templatePath = storage_path('app/public/' . $this->event->template_path);
-        $ext = strtolower(pathinfo($templatePath, PATHINFO_EXTENSION));
 
         $pdf->AddPage('L', 'A4');
-        if ($ext === 'pdf') {
-            $pdf->setSourceFile($templatePath);
-            $tplIdx = $pdf->importPage(1);
-            $pdf->useTemplate($tplIdx, 0, 0, 297, 210);
-        } else {
-            $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
-        }
+        $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
 
-        $pdf->SetFont('helvetica', 'B', 24);
-        $pdf->SetTextColor(13, 71, 161);
+        list($r, $g, $b) = sscanf($this->event->text_color, "#%02x%02x%02x");
+        $pdf->SetFont($this->event->font_family, 'B', $this->event->font_size);
+        $pdf->SetTextColor($r, $g, $b);
+        
         $pdf->SetXY(0, $this->event->y_coord);
-        $pdf->Cell(297, 10, mb_strtoupper($this->participant->full_name, 'UTF-8'), 0, 1, 'C');
+        $pdf->Cell(297, 0, mb_strtoupper($this->participant->full_name, 'UTF-8'), 0, 1, 'C', 0, '', 0, false, 'T', 'T');
 
         $fileName = 'certificados_temp/cert_' . $this->participant->id . '.pdf';
         Storage::disk('local')->put($fileName, $pdf->Output('', 'S'));

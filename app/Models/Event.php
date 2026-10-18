@@ -18,7 +18,10 @@ class Event extends Model
         'end_date',
         'template_path',
         'x_coord',
-        'y_coord'
+        'y_coord',
+        'font_family',
+        'font_size',
+        'text_color'
     ];
 
     protected $casts = [
