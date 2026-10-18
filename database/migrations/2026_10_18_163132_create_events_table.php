@@ -6,20 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
+            $table->string('title');
+            $table->enum('document_type', ['certificacion', 'reconocimiento', 'participacion']);
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
+            $table->string('template_path')->nullable();
+            $table->float('x_coord')->nullable();
+            $table->float('y_coord')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('events');
