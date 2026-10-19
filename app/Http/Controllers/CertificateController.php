@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Participant;
 use Illuminate\Http\Request;
-use setasign\Fpdi\Tcpdf\Fpdi;
+use TCPDF;
 use App\Jobs\SendCertificateJob;
 
 class CertificateController extends Controller
 {
     private function generatePDF($event, $participants)
     {
-        $pdf = new Fpdi('L', 'mm', 'A4');
+        $pdf = new TCPDF('L', 'mm', 'A4');
         
-        // Configuraciones estrictas para eliminar los márgenes por defecto
         $pdf->SetMargins(0, 0, 0, true);
         $pdf->SetAutoPageBreak(false, 0);
         $pdf->SetPrintHeader(false);
@@ -26,14 +25,14 @@ class CertificateController extends Controller
         foreach ($participants as $participant) {
             $pdf->AddPage('L', 'A4');
             
-            // La imagen llena estrictamente los 297x210 mm
-            $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
+            if ($event->template_path && file_exists($templatePath)) {
+                $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
+            }
 
             $pdf->SetFont($event->font_family, 'B', $event->font_size);
             $pdf->SetTextColor($r, $g, $b);
             
             $pdf->SetXY(0, $event->y_coord);
-            // Alineación de celda configurada en 'T' para que calce exactamente desde el borde superior
             $pdf->Cell(297, 0, mb_strtoupper($participant->full_name, 'UTF-8'), 0, 1, 'C', 0, '', 0, false, 'T', 'T');
         }
 

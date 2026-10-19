@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use setasign\Fpdi\Tcpdf\Fpdi;
+use TCPDF;
 
 class SendCertificateJob implements ShouldQueue
 {
@@ -29,7 +29,7 @@ class SendCertificateJob implements ShouldQueue
 
     public function handle(): void
     {
-        $pdf = new Fpdi('L', 'mm', 'A4');
+        $pdf = new TCPDF('L', 'mm', 'A4');
         $pdf->SetMargins(0, 0, 0, true);
         $pdf->SetAutoPageBreak(false, 0);
         $pdf->SetPrintHeader(false);
@@ -38,7 +38,9 @@ class SendCertificateJob implements ShouldQueue
         $templatePath = storage_path('app/public/' . $this->event->template_path);
 
         $pdf->AddPage('L', 'A4');
-        $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
+        if ($this->event->template_path && file_exists($templatePath)) {
+            $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
+        }
 
         list($r, $g, $b) = sscanf($this->event->text_color, "#%02x%02x%02x");
         $pdf->SetFont($this->event->font_family, 'B', $this->event->font_size);
