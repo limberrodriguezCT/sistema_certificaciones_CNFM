@@ -1,48 +1,59 @@
 @extends('layouts.app')
-@section('title', 'Crear Evento')
+@section('title', 'Registrar Nuevo Evento')
 
 @section('content')
-<div class="max-w-2xl mx-auto bg-white p-8 rounded shadow-md border-t-8 border-cyan-500 relative overflow-hidden">
-    <h2 class="text-2xl font-bold mb-6 text-gray-800">Registrar Nuevo Evento</h2>
-    <form action="{{ route('events.store') }}" method="POST" enctype="multipart/form-data">
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md border-t-8 border-cyan-500">
+    <div class="flex justify-between items-center mb-6 border-b pb-4">
+        <div>
+            <h2 class="text-2xl font-extrabold text-slate-800">Registrar Nuevo Evento</h2>
+            <p class="text-xs text-slate-500 mt-1">Complete los datos generales y cargue la imagen base del certificado.</p>
+        </div>
+        <a href="{{ route('events.index') }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold text-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <form action="{{ route('events.store') }}" method="POST" enctype="multipart/form-data" novalidate>
         @csrf
-        <div class="mb-4">
-            <label class="block text-gray-700 font-bold mb-2">Título del Evento</label>
-            <input type="text" name="title" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500" value="{{ old('title') }}">
-            @error('title') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
+        <div class="mb-5">
+            <label class="block text-slate-700 font-bold mb-2 text-sm">Título del Evento</label>
+            <input type="text" name="title" value="{{ old('title') }}" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" placeholder="Ej. Congreso Nacional de Tecnología Educativa">
         </div>
         
-        <div class="mb-4">
-            <label class="block text-gray-700 font-bold mb-2">Tipo de Documento</label>
-            <select name="document_type" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500">
-                <option value="certificacion">Certificación</option>
-                <option value="reconocimiento">Reconocimiento</option>
-                <option value="participacion">Participación</option>
+        <div class="mb-5">
+            <label class="block text-slate-700 font-bold mb-2 text-sm">Tipo de Documento a Emitir</label>
+            <select name="document_type" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 bg-white">
+                <option value="certificacion" {{ old('document_type') == 'certificacion' ? 'selected' : '' }}>Certificación</option>
+                <option value="reconocimiento" {{ old('document_type') == 'reconocimiento' ? 'selected' : '' }}>Reconocimiento</option>
+                <option value="participacion" {{ old('document_type') == 'participacion' ? 'selected' : '' }}>Participación</option>
             </select>
-            @error('document_type') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
             <div>
-                <label class="block text-gray-700 font-bold mb-2">Apertura</label>
-                <input type="datetime-local" name="start_date" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500" value="{{ old('start_date') }}">
-                @error('start_date') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
+                <label class="block text-slate-700 font-bold mb-2 text-sm">Fecha y Hora de Apertura</label>
+                <input type="datetime-local" name="start_date" value="{{ old('start_date') }}" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600">
             </div>
             <div>
-                <label class="block text-gray-700 font-bold mb-2">Cierre</label>
-                <input type="datetime-local" name="end_date" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500" value="{{ old('end_date') }}">
-                @error('end_date') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
+                <label class="block text-slate-700 font-bold mb-2 text-sm">Fecha y Hora de Cierre</label>
+                <input type="datetime-local" name="end_date" value="{{ old('end_date') }}" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600">
             </div>
         </div>
 
-        <div class="mb-6">
-            <label class="block text-gray-700 font-bold mb-2">Plantilla Base (Opcional, PDF o Imagen)</label>
-            <input type="file" name="template_path" class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500">
-            @error('template_path') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
+        <div class="mb-6 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
+            <label class="block text-slate-800 font-bold mb-2 text-sm">
+                <i class="fa-regular fa-image text-blue-600 mr-1"></i> Plantilla Base del Certificado (Solo Imagen JPG o PNG)
+            </label>
+            <input type="file" name="template_path" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:border-blue-600 text-sm">
+            <p class="text-xs text-slate-600 mt-2 font-medium">
+                <i class="fa-solid fa-circle-info text-cyan-600 mr-1"></i> Importante: El sistema trabaja exclusivamente con formatos de imagen (<strong>.JPG, .JPEG o .PNG</strong> hasta 5MB) en orientación horizontal. No se admiten archivos PDF.
+            </p>
         </div>
 
         <div class="flex justify-end">
-            <button type="submit" class="cnfd-bg text-white px-6 py-2 rounded-full font-bold shadow hover:bg-blue-800 transition">Guardar Evento</button>
+            <button type="submit" class="cnfd-bg text-white px-8 py-3 rounded-xl font-bold shadow-md hover:opacity-95 transition flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar y Configurar Diseño
+            </button>
         </div>
     </form>
 </div>

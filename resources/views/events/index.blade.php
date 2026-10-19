@@ -1,55 +1,126 @@
 @extends('layouts.app')
-@section('title', 'Lista de Eventos')
+@section('title', 'Gestión de Eventos')
 
 @section('content')
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-800 border-b-4 border-cyan-500 pb-2">Gestión de Eventos</h1>
-    <a href="{{ route('events.create') }}" class="cnfd-magenta text-white px-6 py-2 rounded-full shadow hover:bg-pink-700 transition font-bold">Crear Evento</a>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-xl shadow-sm border-l-8 border-cyan-500">
+    <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800">Panel de Gestión de Eventos</h1>
+        <p class="text-slate-500 text-sm mt-1">Administre los enlaces de inscripción, plantillas de certificados y nóminas de participantes.</p>
+    </div>
+    <a href="{{ route('events.create') }}" class="cnfd-magenta text-white px-6 py-3 rounded-xl shadow-md hover:bg-pink-700 transition font-bold flex items-center gap-2">
+        <i class="fa-solid fa-plus-circle text-lg"></i> Crear Nuevo Evento
+    </a>
 </div>
 
-<div class="bg-white shadow-lg rounded-lg border-t-4 border-blue-900 my-6 overflow-hidden">
+<div class="bg-white shadow-md rounded-xl border border-slate-200 overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="min-w-full bg-white">
-            <thead class="bg-gray-100 text-gray-600 uppercase text-sm border-b-2 border-gray-200">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-800 text-white uppercase text-xs tracking-wider">
                 <tr>
-                    <th class="py-4 px-6 font-bold text-left tracking-wider">Título</th>
-                    <th class="py-4 px-6 font-bold text-left tracking-wider">Tipo</th>
-                    <th class="py-4 px-6 font-bold text-left tracking-wider">Cierre</th>
-                    <th class="py-4 px-6 font-bold text-center tracking-wider">Acciones Administrativas</th>
+                    <th class="py-4 px-6 font-bold text-left">Evento / Tipo</th>
+                    <th class="py-4 px-6 font-bold text-left">Vigencia del Registro</th>
+                    <th class="py-4 px-6 font-bold text-center">Inscritos</th>
+                    <th class="py-4 px-6 font-bold text-center">Enlace de Inscripción</th>
+                    <th class="py-4 px-6 font-bold text-center">Gestión y Diseño</th>
                 </tr>
             </thead>
-            <tbody class="text-gray-700 text-sm">
-                @foreach($events as $event)
-                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-                    <td class="py-4 px-6 font-bold text-gray-800">{{ $event->title }}</td>
-                    <td class="py-4 px-6 font-bold text-blue-900">{{ mb_strtoupper($event->document_type) }}</td>
-                    <td class="py-4 px-6 text-gray-600 font-medium">{{ $event->end_date->format('d/m/Y H:i') }}</td>
-                    <td class="py-4 px-6 flex justify-center flex-wrap gap-2">
-                        <a href="{{ route('participants.create', $event->uuid) }}" target="_blank" class="inline-flex items-center px-3 py-1 bg-pink-100 text-pink-700 rounded-full font-bold hover:bg-pink-200 transition border border-pink-200">
-                            Enlace
+            <tbody class="divide-y divide-slate-100 text-sm bg-white">
+                @forelse($events as $event)
+                @php
+                    $now = now();
+                    $isActive = $now->between($event->start_date, $event->end_date);
+                @endphp
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-4 px-6">
+                        <div class="font-extrabold text-slate-800 text-base">{{ $event->title }}</div>
+                        <span class="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 uppercase">
+                            <i class="fa-solid fa-award text-cyan-600"></i> {{ $event->document_type }}
+                        </span>
+                    </td>
+
+                    <td class="py-4 px-6">
+                        <div class="text-slate-700 font-medium">
+                            <i class="fa-regular fa-clock text-slate-400 mr-1"></i> Cierra: {{ $event->end_date->format('d/m/Y h:i A') }}
+                        </div>
+                        @if($isActive)
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Formulario Abierto
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-rose-600 mt-1">
+                                <span class="w-2 h-2 rounded-full bg-rose-500"></span> Formulario Cerrado
+                            </span>
+                        @endif
+                    </td>
+
+                    <td class="py-4 px-6 text-center">
+                        <a href="{{ route('events.show', $event) }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-800 hover:text-blue-700 font-extrabold transition border border-slate-200" title="Ver lista de participantes">
+                            <i class="fa-solid fa-users text-blue-600"></i> {{ $event->participants()->count() }}
                         </a>
-                        <a href="{{ route('events.show', $event) }}" class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-bold hover:bg-blue-200 transition border border-blue-200">
-                            Historial
-                        </a>
-                        <a href="{{ route('events.edit', $event) }}" class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full font-bold hover:bg-gray-200 transition border border-gray-300">
-                            Datos
-                        </a>
-                        <a href="{{ route('events.map', $event) }}" class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full font-bold hover:bg-indigo-200 transition border border-indigo-200">
-                            Diseño
-                        </a>
-                        
-                        <form action="{{ route('events.destroy', $event) }}" method="POST" class="form-delete inline-block m-0">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full font-bold hover:bg-red-200 transition border border-red-200">
-                                Eliminar
+                    </td>
+
+                    <td class="py-4 px-6 text-center">
+                        <div class="inline-flex items-center gap-2">
+                            <button type="button" onclick="copyLink('{{ route('participants.create', $event->uuid) }}')" class="px-3 py-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-800 rounded-lg font-bold text-xs border border-cyan-200 transition flex items-center gap-1.5" title="Copiar enlace para compartir">
+                                <i class="fa-regular fa-copy"></i> Copiar Enlace
                             </button>
-                        </form>
+                            <a href="{{ route('participants.create', $event->uuid) }}" target="_blank" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 transition" title="Abrir formulario público en pestaña nueva">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+                    </td>
+
+                    <td class="py-4 px-6 text-center">
+                        <div class="flex justify-center items-center flex-wrap gap-2">
+                            <a href="{{ route('events.show', $event) }}" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-xs shadow-sm transition flex items-center gap-1.5" title="Ver participantes y emitir certificados">
+                                <i class="fa-solid fa-list-check"></i> Participantes
+                            </a>
+
+                            <a href="{{ route('events.map', $event) }}" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs shadow-sm transition flex items-center gap-1.5" title="Posicionar nombre y tipografía en el certificado">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Diseñar Certificado
+                            </a>
+
+                            <a href="{{ route('events.edit', $event) }}" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-xs shadow-sm transition flex items-center gap-1.5" title="Modificar título, fechas o imagen del evento">
+                                <i class="fa-solid fa-pen-to-square"></i> Editar Evento
+                            </a>
+
+                            <form action="{{ route('events.destroy', $event) }}" method="POST" class="form-delete inline-block m-0">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold text-xs shadow-sm transition flex items-center gap-1.5" title="Eliminar evento permanentemente">
+                                    <i class="fa-solid fa-trash-can"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-slate-500">
+                        <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3 block"></i>
+                        <span class="font-bold text-base block">No hay eventos registrados todavía.</span>
+                        <span class="text-xs">Haga clic en el botón "Crear Nuevo Evento" para comenzar.</span>
+                    </td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    function copyLink(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Enlace copiado al portapapeles',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true
+            });
+        });
+    }
+</script>
 @endsection

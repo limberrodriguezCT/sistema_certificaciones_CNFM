@@ -20,7 +20,7 @@ class CertificateController extends Controller
         $pdf->SetPrintFooter(false);
 
         $templatePath = storage_path('app/public/' . $event->template_path);
-        list($r, $g, $b) = sscanf($event->text_color, "#%02x%02x%02x");
+        list($r, $g, $b) = sscanf($event->text_color ?? '#0d47a1', "#%02x%02x%02x");
 
         foreach ($participants as $participant) {
             $pdf->AddPage('L', 'A4');
@@ -29,10 +29,10 @@ class CertificateController extends Controller
                 $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
             }
 
-            $pdf->SetFont($event->font_family, 'B', $event->font_size);
+            $pdf->SetFont($event->font_family ?? 'helvetica', 'B', $event->font_size ?? 24);
             $pdf->SetTextColor($r, $g, $b);
             
-            $pdf->SetXY(0, $event->y_coord);
+            $pdf->SetXY(0, $event->y_coord ?? 100);
             $pdf->Cell(297, 0, mb_strtoupper($participant->full_name, 'UTF-8'), 0, 1, 'C', 0, '', 0, false, 'T', 'T');
         }
 
@@ -45,7 +45,11 @@ class CertificateController extends Controller
         $pdf = $this->generatePDF($event, [$dummyParticipant]);
         
         if (ob_get_length()) ob_end_clean();
-        return response($pdf->Output('vista_previa_' . $event->title . '.pdf', 'D'))->header('Content-Type', 'application/pdf');
+        
+        // Parámetro 'I' para previsualizar directamente en el navegador sin forzar descarga
+        return response($pdf->Output('vista_previa_' . $event->id . '.pdf', 'I'))
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="vista_previa.pdf"');
     }
 
     public function downloadIndividual(Participant $participant)
@@ -54,32 +58,37 @@ class CertificateController extends Controller
         $pdf = $this->generatePDF($event, [$participant]);
         
         if (ob_get_length()) ob_end_clean();
-        return response($pdf->Output($participant->full_name . '.pdf', 'D'))->header('Content-Type', 'application/pdf');
+        
+        return response($pdf->Output($participant->full_name . '.pdf', 'I'))
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $participant->full_name . '.pdf"');
     }
 
     public function downloadBulk(Event $event)
     {
         $participants = $event->participants;
-        if($participants->isEmpty()){
+        if ($participants->isEmpty()) {
             return back()->with('error', 'No existen participantes registrados en este evento.');
         }
         $pdf = $this->generatePDF($event, $participants);
         
         if (ob_get_length()) ob_end_clean();
-        return response($pdf->Output('Consolidado_'.$event->title.'.pdf', 'D'))->header('Content-Type', 'application/pdf');
+        
+        return response($pdf->Output('Consolidado_' . $event->title . '.pdf', 'D'))
+            ->header('Content-Type', 'application/pdf');
     }
 
     public function sendBulkEmails(Event $event)
     {
         $participants = $event->participants;
-        if($participants->isEmpty()){
-            return back()->with('error', 'No existen participantes para enviar correos.');
+        if ($participants->isEmpty()) {
+            return back()->with('error', 'No existen participantes registrados para enviar correos.');
         }
 
         foreach ($participants as $participant) {
             SendCertificateJob::dispatch($participant, $event);
         }
 
-        return back()->with('success', 'La emisión de certificados se está procesando en segundo plano.');
+        return back()->with('success', 'Los certificados han sido enviados correctamente.');
     }
 }
