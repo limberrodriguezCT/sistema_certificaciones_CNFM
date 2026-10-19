@@ -2,12 +2,14 @@
 
 namespace App\Mail;
 
+use App\Models\Event;
+use App\Models\Participant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
 
 class CertificateMail extends Mailable
 {
@@ -15,9 +17,9 @@ class CertificateMail extends Mailable
 
     public $participant;
     public $event;
-    public $pdfPath;
+    protected $pdfPath;
 
-    public function __construct($participant, $event, $pdfPath)
+    public function __construct(Participant $participant, Event $event, string $pdfPath)
     {
         $this->participant = $participant;
         $this->event = $event;
@@ -27,7 +29,7 @@ class CertificateMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tu Certificado - ' . $this->event->title,
+            subject: 'Certificado Oficial - ' . $this->event->title,
         );
     }
 
@@ -42,7 +44,7 @@ class CertificateMail extends Mailable
     {
         return [
             Attachment::fromPath($this->pdfPath)
-                ->as('Certificado.pdf')
+                ->as('Certificado_' . str_replace(' ', '_', $this->participant->full_name) . '.pdf')
                 ->withMime('application/pdf'),
         ];
     }

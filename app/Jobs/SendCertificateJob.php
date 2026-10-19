@@ -42,17 +42,23 @@ class SendCertificateJob implements ShouldQueue
             $pdf->Image($templatePath, 0, 0, 297, 210, '', '', '', false, 300, '', false, false, 0);
         }
 
-        list($r, $g, $b) = sscanf($this->event->text_color, "#%02x%02x%02x");
-        $pdf->SetFont($this->event->font_family, 'B', $this->event->font_size);
+        list($r, $g, $b) = sscanf($this->event->text_color ?? '#0d47a1', "#%02x%02x%02x");
+        $pdf->SetFont($this->event->font_family ?? 'helvetica', 'B', $this->event->font_size ?? 24);
         $pdf->SetTextColor($r, $g, $b);
         
-        $pdf->SetXY(0, $this->event->y_coord);
+        $pdf->SetXY(0, $this->event->y_coord ?? 100);
         $pdf->Cell(297, 0, mb_strtoupper($this->participant->full_name, 'UTF-8'), 0, 1, 'C', 0, '', 0, false, 'T', 'T');
+
+        // Asegurar que el directorio temporal exista en el disco local
+        Storage::disk('local')->makeDirectory('certificados_temp');
 
         $fileName = 'certificados_temp/cert_' . $this->participant->id . '.pdf';
         Storage::disk('local')->put($fileName, $pdf->Output('', 'S'));
 
-        Mail::to($this->participant->email)->send(new CertificateMail($this->participant, $this->event, storage_path('app/' . $fileName)));
+        // Obtener la ruta absoluta exacta desde el mismo disco local
+        $fullPath = Storage::disk('local')->path($fileName);
+
+        Mail::to($this->participant->email)->send(new CertificateMail($this->participant, $this->event, $fullPath));
 
         Storage::disk('local')->delete($fileName);
     }
