@@ -19,11 +19,11 @@
         </div>
         <div class="content">
             <p>Estimado(a) <strong>{{ $participant->full_name }}</strong>,</p>
-            <p>Reciba un cordial saludo. Por medio del presente correo hacemos entrega formal de su documento de <span class="highlight">{{ strtoupper($event->document_type) }}</span> correspondiente a la actividad académica:</p>
+            <p>Reciba un cordial saludo. Por medio del presente correo hacemos entrega formal de su certificado de <span class="highlight">{{ strtoupper($event->document_type) }}</span> correspondiente a:</p>
             <p style="font-size: 16px; font-weight: bold; color: #e91e63; text-align: center; margin: 20px 0;">
                 "{{ $event->title }}"
             </p>
-            <p>El documento oficial se encuentra adjunto a este mensaje en formato PDF listo para su descarga e impresión.</p>
+            <p>El certificado se encuentra adjunto a este mensaje en formato PDF.</p>
             <p style="margin-top: 25px;">Atentamente,<br><strong>Centro Nacional de Formación de Maestras y Maestros de la Educación Técnica y Formación Profesional Sede Centro Técnologico Olof Palme, Estelí</strong></p>
         </div>
         <div class="footer">
