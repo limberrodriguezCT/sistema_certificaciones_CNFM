@@ -21,7 +21,7 @@
             <img src="{{ asset('images/logo-inatec-blanco.png') }}" alt="INATEC" class="h-12 w-auto object-contain" onerror="this.style.display='none'">
             <div class="border-l-2 border-cyan-400 pl-4">
                 <span class="block font-extrabold text-base md:text-xl tracking-wide leading-tight">
-                    Centro Nacional de Formación de Maestras y Maestros
+                    Centro Nacional de Formación de Maestras y Maestros de la Educación Técnica y Formación Profesional Sede Centro Tecnológico Olof Palme, Estelí
                 </span>
                 <span class="block text-xs text-cyan-200 uppercase tracking-widest font-semibold">
                     Registro Oficial de Protagonistas

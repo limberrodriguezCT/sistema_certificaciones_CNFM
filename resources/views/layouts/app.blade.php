@@ -21,7 +21,7 @@
                 <img src="{{ asset('images/logo-inatec-blanco.png') }}" alt="INATEC" class="h-12 w-auto object-contain" onerror="this.style.display='none'">
                 <div class="border-l-2 border-cyan-400 pl-4">
                     <span class="block font-extrabold text-lg md:text-xl tracking-wide leading-tight">
-                        Centro Nacional de Formación de Maestras y Maestros
+                        Centro Nacional de Formación de Maestras y Maestros de la Educación Técnica y Formación Profesional Sede Centro Tecnológico Olof Palme, Estelí
                     </span>
                     <span class="block text-xs text-cyan-200 uppercase tracking-widest font-semibold">
                         Sistema de Emisión de Certificados
@@ -50,7 +50,7 @@
     </main>
 
     <footer class="bg-slate-800 text-slate-400 text-xs text-center py-4 border-t border-slate-700">
-        Centro Nacional de Formación de Maestras y Maestros - INATEC &copy; {{ date('Y') }}
+        Centro Nacional de Formación de Maestras y Maestros de la Educación Técnica y Formación Profesional Sede Centro Técnologico Olof Palme, Estelí &copy; {{ date('Y') }}
     </footer>
 
     <script>
