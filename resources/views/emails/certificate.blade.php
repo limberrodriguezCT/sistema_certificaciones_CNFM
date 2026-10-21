@@ -14,7 +14,7 @@
 <body>
     <div class="card">
         <div class="header">
-            <h2 style="margin: 0; font-size: 20px;">Centro Nacional de Formación de Maestras y Maestros</h2>
+            <h2 style="margin: 0; font-size: 20px;">Centro Nacional de Formación de Maestras y Maestros de la Educación Técnica y Formación Profesional Sede Centro Técnologico Olof Palme, Estelí</h2>
             <p style="margin: 5px 0 0; font-size: 13px; color: #bae6fd;">Emisión Oficial de Certificados</p>
         </div>
         <div class="content">
@@ -24,7 +24,7 @@
                 "{{ $event->title }}"
             </p>
             <p>El documento oficial se encuentra adjunto a este mensaje en formato PDF listo para su descarga e impresión.</p>
-            <p style="margin-top: 25px;">Atentamente,<br><strong>Centro Nacional de Formación de Maestras y Maestros - INATEC</strong></p>
+            <p style="margin-top: 25px;">Atentamente,<br><strong>Centro Nacional de Formación de Maestras y Maestros Educación Técnica y Formación Profesional Sede Centro Técnologico Olof Palme, Estelí</strong></p>
         </div>
         <div class="footer">
             Este es un mensaje generado automáticamente. Por favor, no responda a este correo.
